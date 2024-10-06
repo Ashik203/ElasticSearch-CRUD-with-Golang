@@ -27,7 +27,8 @@ func (s service) create(ctx context.Context, req createRequest) (createResponse,
 		return createResponse{}, err
 	}
 
-	return createResponse{ID: id}, nil
+	return createResponse{ID: id, Title: req.Title, Text: req.Text,
+		Tags: req.Tags}, nil
 }
 
 func (s service) update(ctx context.Context, req updateRequest) error {

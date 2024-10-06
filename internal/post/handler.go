@@ -11,7 +11,7 @@ import (
 )
 
 type Handler struct {
-	service service
+	service service	
 }
 
 func New(storage storage.PostStorer) Handler {
@@ -63,7 +63,7 @@ func (h Handler) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -80,6 +80,7 @@ func (h Handler) Delete(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusNoContent)
 }
 

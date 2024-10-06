@@ -3,7 +3,10 @@ package post
 import "time"
 
 type createResponse struct {
-	ID string `json:"id"`
+	ID    string   `json:"id"`
+	Title string   `json:"title"`
+	Text  string   `json:"text"`
+	Tags  []string `json:"tags"`
 }
 
 type findResponse struct {
