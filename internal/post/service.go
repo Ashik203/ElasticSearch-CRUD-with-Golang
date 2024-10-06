@@ -31,7 +31,7 @@ func (s service) create(ctx context.Context, req createRequest) (createResponse,
 		Tags: req.Tags}, nil
 }
 
-func (s service) update(ctx context.Context, req updateRequest) error {
+func (s service) update(ctx context.Context, req updateRequest) (updateResponse, error) {
 	doc := storage.Post{
 		ID:    req.ID,
 		Title: req.Title,
@@ -40,16 +40,17 @@ func (s service) update(ctx context.Context, req updateRequest) error {
 	}
 
 	if err := s.storage.Update(ctx, doc); err != nil {
-		return err
+		return updateResponse{}, err
 	}
-	return nil
+	return updateResponse{Title: req.Title, Text: req.Text,
+		Tags: req.Tags}, nil
 }
 
-func (s service) delete(ctx context.Context, req deleteRequest) error {
+func (s service) delete(ctx context.Context, req deleteRequest) (deleteResponse, error) {
 	if err := s.storage.Delete(ctx, req.ID); err != nil {
-		return err
+		return deleteResponse{}, err
 	}
-	return nil
+	return deleteResponse{ID: req.ID}, nil
 }
 
 func (s service) find(ctx context.Context, req findRequest) (findResponse, error) {

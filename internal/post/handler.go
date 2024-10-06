@@ -11,7 +11,7 @@ import (
 )
 
 type Handler struct {
-	service service	
+	service service
 }
 
 func New(storage storage.PostStorer) Handler {
@@ -54,22 +54,28 @@ func (h Handler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.ID = httprouter.ParamsFromContext(r.Context()).ByName("id")
-	if err := h.service.update(r.Context(), req); err != nil {
+	res, err := h.service.update(r.Context(), req)
+	if err != nil {
 		switch err {
 		case domain.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err)
 		}
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusCreated)
+	bdy, _ := json.Marshal(res)
+	_, _ = w.Write(bdy)
 }
 
 func (h Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := httprouter.ParamsFromContext(r.Context()).ByName("id")
-	if err := h.service.delete(r.Context(), deleteRequest{ID: id}); err != nil {
+	res, err := h.service.delete(r.Context(), deleteRequest{ID: id})
+	if err != nil {
 		switch err {
 		case domain.ErrNotFound:
 			w.WriteHeader(http.StatusNotFound)
@@ -81,7 +87,9 @@ func (h Handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusCreated)
+	bdy, _ := json.Marshal(res)
+	_, _ = w.Write(bdy)
 }
 
 func (h Handler) Find(w http.ResponseWriter, r *http.Request) {

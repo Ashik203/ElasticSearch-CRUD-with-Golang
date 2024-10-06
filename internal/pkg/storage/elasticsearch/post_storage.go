@@ -19,10 +19,6 @@ type PostStorage struct {
 	timeout time.Duration
 }
 
-func (p PostStorage) Update(ctx context.Context, post storage.Post) error {
-	panic("unimplemented")
-}
-
 func NewPostStorage(elastic ElasticSearch) (PostStorage, error) {
 	return PostStorage{
 		elastic: elastic,
@@ -85,6 +81,39 @@ func (p PostStorage) Delete(ctx context.Context, id string) error {
 	if res.IsError() {
 		return fmt.Errorf("delete: response:%s", res.String())
 	}
+	return nil
+}
+
+func (p PostStorage) Update(ctx context.Context, post storage.Post) error {
+	bdy, err := json.Marshal(post)
+	if err != nil {
+		return fmt.Errorf("update: marshall: %w", err)
+	}
+
+	// res, err := p.elastic.client.Update()
+	req := esapi.UpdateRequest{
+		Index:      p.elastic.alias,
+		DocumentID: post.ID,
+		Body:       bytes.NewReader([]byte(fmt.Sprintf(`{"doc":%s}`, bdy))),
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, p.timeout)
+	defer cancel()
+
+	res, err := req.Do(ctx, p.elastic.client)
+	if err != nil {
+		return fmt.Errorf("update: request: %w", err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == 404 {
+		return domain.ErrNotFound
+	}
+
+	if res.IsError() {
+		return fmt.Errorf("update: response: %s", res.String())
+	}
+
 	return nil
 }
 
