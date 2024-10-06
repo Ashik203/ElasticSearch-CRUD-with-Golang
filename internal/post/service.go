@@ -15,7 +15,6 @@ type service struct {
 func (s service) create(ctx context.Context, req createRequest) (createResponse, error) {
 	id := uuid.New().String()
 	cr := time.Now().UTC()
-
 	doc := storage.Post{
 		ID:        id,
 		Title:     req.Title,

@@ -25,13 +25,11 @@ func New(addresses []string) (*ElasticSearch, error) {
 	return &ElasticSearch{
 		client: client,
 	}, nil
-
 }
 
 func (e *ElasticSearch) CreateIndex(index string) error {
 	e.index = index
 	e.alias = index + "_alias"
-
 	res, err := e.client.Indices.Exists([]string{e.index})
 	if err != nil {
 		return fmt.Errorf("cannot check index existance: %w", err)
@@ -40,6 +38,7 @@ func (e *ElasticSearch) CreateIndex(index string) error {
 	if res.StatusCode == 200 {
 		return nil
 	}
+
 	if res.StatusCode != 404 {
 		return fmt.Errorf("error in index existance response:%s", res.String())
 	}
@@ -48,15 +47,16 @@ func (e *ElasticSearch) CreateIndex(index string) error {
 	if err != nil {
 		return fmt.Errorf("cannot create index:%w", err)
 	}
+
 	if res.IsError() {
 		return fmt.Errorf("error in index creation response: %s", res.String())
-
 	}
 
 	res, err = e.client.Indices.PutAlias([]string{e.index}, e.alias)
 	if err != nil {
 		return fmt.Errorf("canot create index alias:%w", err)
 	}
+
 	if res.IsError() {
 		return fmt.Errorf("error in index alias creation response:%s", res.String())
 	}

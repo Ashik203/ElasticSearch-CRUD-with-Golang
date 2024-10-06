@@ -20,10 +20,8 @@ func New(storage storage.PostStorer) Handler {
 	}
 }
 
-// POST /api/v1/posts
 func (h Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var req createRequest
-
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Println(err)
@@ -45,11 +43,9 @@ func (h Handler) Create(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	bdy, _ := json.Marshal(res)
 	_, _ = w.Write(bdy)
-
 }
 
 func (h Handler) Update(w http.ResponseWriter, r *http.Request) {
-
 	var req updateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -58,7 +54,6 @@ func (h Handler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.ID = httprouter.ParamsFromContext(r.Context()).ByName("id")
-
 	if err := h.service.update(r.Context(), req); err != nil {
 		switch err {
 		case domain.ErrNotFound:
@@ -70,14 +65,10 @@ func (h Handler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-
 }
-
-//delete
 
 func (h Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := httprouter.ParamsFromContext(r.Context()).ByName("id")
-
 	if err := h.service.delete(r.Context(), deleteRequest{ID: id}); err != nil {
 		switch err {
 		case domain.ErrNotFound:
@@ -94,7 +85,6 @@ func (h Handler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) Find(w http.ResponseWriter, r *http.Request) {
 	id := httprouter.ParamsFromContext(r.Context()).ByName("id")
-
 	res, err := h.service.find(r.Context(), findRequest{ID: id})
 	if err != nil {
 		switch err {
@@ -106,6 +96,7 @@ func (h Handler) Find(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
 	bdy, _ := json.Marshal(res)

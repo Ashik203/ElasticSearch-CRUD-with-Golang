@@ -19,7 +19,6 @@ type PostStorage struct {
 	timeout time.Duration
 }
 
-// Update implements storage.PostStorer.
 func (p PostStorage) Update(ctx context.Context, post storage.Post) error {
 	panic("unimplemented")
 }
@@ -45,10 +44,12 @@ func (p PostStorage) Insert(ctx context.Context, post storage.Post) error {
 
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
+
 	res, err := req.Do(ctx, p.elastic.client)
 	if err != nil {
 		return fmt.Errorf("insert: request: %w", err)
 	}
+
 	defer res.Body.Close()
 
 	if res.StatusCode == 409 {
@@ -60,7 +61,6 @@ func (p PostStorage) Insert(ctx context.Context, post storage.Post) error {
 	}
 
 	return nil
-
 }
 
 func (p PostStorage) Delete(ctx context.Context, id string) error {
@@ -122,5 +122,4 @@ func (p PostStorage) FindOne(ctx context.Context, id string) (storage.Post, erro
 	}
 
 	return post, nil
-
 }

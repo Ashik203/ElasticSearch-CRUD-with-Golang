@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-
 	elastic, err := elasticsearch.New([]string{"http://0.0.0.0:9200"})
 	if err != nil {
 		log.Fatalln(err)
@@ -34,5 +33,4 @@ func main() {
 	router.HandlerFunc("GET", "/api/v1/posts/:id", postAPI.Find)
 
 	log.Fatalln(http.ListenAndServe(":3000", router))
-
 }
